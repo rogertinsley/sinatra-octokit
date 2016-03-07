@@ -73,12 +73,18 @@ module Spike
       user.login.to_json
     end
 
+    # Milestones
+    # https://api.github.com/repos/rogertinsley/sinatra-octokit/milestones
     get '/repos/:owner/:repo/milestone' do
       client = Octokit::Client.new(:access_token => session[:access_token])
-      # options = params['owner'] + "/" + params['repo']
       options = { :repo => params['repo'], :owner => params['owner'] }
       milestones = client.list_milestones options
-      milestones.to_json
+      data = Hash.new
+      milestones.each do |milestone|
+        data[:title] = milestone.title
+        data[:description] = milestone.description
+      end
+      data.to_json
     end
 
   end
