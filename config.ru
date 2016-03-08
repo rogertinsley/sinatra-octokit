@@ -15,6 +15,14 @@ module Spike
     # Provide authentication credentials
     Octokit.configure do |c|
       c.connection_options[:ssl] = { :verify => false }
+
+      stack = Faraday::RackBuilder.new do |builder|
+        builder.response :logger
+        builder.use Octokit::Response::RaiseError
+        builder.adapter Faraday.default_adapter
+      end
+      Octokit.middleware = stack
+      Octokit.user 'rogertinsley'
     end
 
     def authenticated?
@@ -23,7 +31,7 @@ module Spike
 
     def authenticate!
       client = Octokit::Client.new
-      url = client.authorize_url CLIENT_ID, :scope => 'user:email'
+      url = client.authorize_url CLIENT_ID, :scope => 'user:email, repo'
       redirect url
     end
 
@@ -104,6 +112,10 @@ module Spike
 
     post '/repos/:owner/:repo/milestone/create' do
       client = Octokit::Client.new(:access_token => session[:access_token])
+      repo = { :repo => params['repo'], :owner => params['owner'] }
+      response = client.create_milestone repo, params['title'], { :description  => params['description']  }
+      headers["Location"] = response.url
+      status 201 # Created
     end
 
   end
