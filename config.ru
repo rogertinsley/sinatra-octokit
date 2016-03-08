@@ -144,6 +144,25 @@ module Spike
       JSON.pretty_generate data
     end
 
+    get '/repos/:owner/:repo/issues/:number' do
+      client = Octokit::Client.new(:access_token => session[:access_token])
+      options = { :repo => params['repo'], :owner => params['owner'] }
+      issue = client.issue options, params['number'].to_i
+      hash = Hash.new
+      hash[:html_url]   = issue.html_url
+      hash[:number]     = issue.number
+      hash[:title]      = issue.title
+      hash[:state]      = issue.state
+      hash[:assignee]   = issue.assignee
+      hash[:milestone]  = issue.milestone
+      hash[:comments]   = issue.comments
+      hash[:created_at] = issue.created_at
+      hash[:updated_at] = issue.updated_at
+      hash[:body]       = issue.body
+      content_type :json
+      JSON.pretty_generate hash
+    end
+
   end
 
   def self.app
