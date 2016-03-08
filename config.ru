@@ -98,6 +98,14 @@ module Spike
       JSON.pretty_generate data
     end
 
+    get '/repos/:owner/:repo/milestone/create' do
+      erb :create_milestone, :locals => { :repo => params['repo'], :owner => params['owner'] }
+    end
+
+    post '/repos/:owner/:repo/milestone/create' do
+      client = Octokit::Client.new(:access_token => session[:access_token])
+    end
+
   end
 
   def self.app
