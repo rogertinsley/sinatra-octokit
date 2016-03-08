@@ -81,10 +81,19 @@ module Spike
       milestones = client.list_milestones options
       data = Hash.new
       milestones.each do |milestone|
-        data[:title] = milestone.title
-        data[:description] = milestone.description
+
+        data[:title]          = milestone.title
+        data[:description]    = milestone.description
+        data[:created_at]     = milestone.created_at
+        data[:updated_at]     = milestone.updated_at
+        data[:due_on]         = milestone.due_on
+        data[:html_url]       = milestone.html_url
+        data[:state]          = milestone.date
+        data[:open_issues]    = milestone.open_issues
+        data[:closed_issues]  = milestone.closed_issues
       end
-      data.to_json
+      content_type :json
+      JSON.pretty_generate data
     end
 
   end
