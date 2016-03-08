@@ -79,18 +79,20 @@ module Spike
       client = Octokit::Client.new(:access_token => session[:access_token])
       options = { :repo => params['repo'], :owner => params['owner'] }
       milestones = client.list_milestones options
-      data = Hash.new
+      data = Array.new
       milestones.each do |milestone|
+        hash = Hash.new
+        hash[:title]          = milestone.title
+        hash[:description]    = milestone.description
+        hash[:created_at]     = milestone.created_at
+        hash[:updated_at]     = milestone.updated_at
+        hash[:due_on]         = milestone.due_on
+        hash[:html_url]       = milestone.html_url
+        hash[:state]          = milestone.date
+        hash[:open_issues]    = milestone.open_issues
+        hash[:closed_issues]  = milestone.closed_issues
 
-        data[:title]          = milestone.title
-        data[:description]    = milestone.description
-        data[:created_at]     = milestone.created_at
-        data[:updated_at]     = milestone.updated_at
-        data[:due_on]         = milestone.due_on
-        data[:html_url]       = milestone.html_url
-        data[:state]          = milestone.date
-        data[:open_issues]    = milestone.open_issues
-        data[:closed_issues]  = milestone.closed_issues
+        data.push(hash)
       end
       content_type :json
       JSON.pretty_generate data
