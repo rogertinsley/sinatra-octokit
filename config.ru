@@ -118,6 +118,32 @@ module Spike
       status 201 # Created
     end
 
+    # Issues
+    # https://api.github.com/repos/rogertinsley/sinatra-octokit/issues
+    get '/repos/:owner/:repo/issues' do
+      client = Octokit::Client.new(:access_token => session[:access_token])
+      options = { :repo => params['repo'], :owner => params['owner'] }
+      issues = client.list_issues options
+      data = Array.new
+      issues.each do |issue|
+        hash = Hash.new
+        hash[:html_url]   = issue.html_url
+        hash[:number]     = issue.number
+        hash[:title]      = issue.title
+        hash[:state]      = issue.state
+        hash[:assignee]   = issue.assignee
+        hash[:milestone]  = issue.milestone
+        hash[:comments]   = issue.comments
+        hash[:created_at] = issue.created_at
+        hash[:updated_at] = issue.updated_at
+        hash[:body]       = issue.body
+
+        data.push(hash)
+      end
+      content_type :json
+      JSON.pretty_generate data
+    end
+
   end
 
   def self.app
